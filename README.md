@@ -6,6 +6,8 @@
 
 [MicroLens 后半程运行手册](docs/final_pipeline.md) 从单卡环境和小样本试跑开始，覆盖训练候选、LoRA SFT、DPO、HaNoRec、可恢复评分、最终评估与演示。第一阶段使用固定的自然候选进行配对对照。实验表格见 [最终结果模板](reports/final_results_template.md)。
 
+[MicroLens 最终报告示例](reports/final_results_simulated.md) 展示从召回、重排、图像遮蔽到效率的完整对照。示例表使用模拟数据，未经实测。
+
 ## 实验室 Qwen 重排交接
 
 已冻结六组验证集候选。请先阅读 [Qwen 重排交接指南](docs/qwen_lab_handoff.md)，参数清单在 [configs/qwen_handoff.json](configs/qwen_handoff.json)，已有实验结果在 [reports/retrieval](reports/retrieval)。
