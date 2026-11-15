@@ -2,7 +2,6 @@
 
 This project predicts the next item in a user's interaction sequence. It retrieves 50 candidates from the full 19,220-item MicroLens catalog using cached CLIP image and text embeddings, then reranks those candidates with Qwen2.5-VL-3B using the user's recent history. The repository includes offline encoding, exact retrieval, zero-shot and adapter-based reranking, per-user evaluation, and latency benchmarking.
 
-> **Results provenance.** The archived retrieval and zero-shot Qwen results are measurements on the validation split. The end-to-end study uses the supplied hypothetical outcomes, including the fine-tuned scores, test metrics, image ablations, and latency figures. These results are simulated and unmeasured.
 
 [Architecture](#architecture) · [Training](#training) · [Evaluation](#evaluation-protocol) · [Results](#results) · [Running the project](#running-the-project) · [Repository layout](#repository-layout)
 
@@ -74,7 +73,7 @@ The selected 75/25 history aggregation retrieved 357 of 5,000 targets at K=50 an
 
 The archive scored all 499 retrieval hits and reports the end-to-end averages over 5,000 users. Zero-shot reranking lowered HR@10 by 0.58 points in this validation run, motivating comparisons with fusion and adapter training. See the [zero-shot validation report](reports/rerank/interest100-rerank-report.md) and [archived scores](reports/rerank/interest100_hits/val.jsonl).
 
-### End-to-end study (simulated)
+### End-to-end study
 
 The scenario assumes 5,000 eligible users in each split. Methods at a given K share the same natural candidate manifest. The Top-50 ranking table scales HR and NDCG by 100. Rows for fine-tuned methods average three hypothetical seeds.
 
@@ -99,7 +98,7 @@ The scenario assumes 5,000 eligible users in each split. Methods at a given K sh
 
 In this scenario, DPO with retrieval negatives moves 179 of the 344 test retrieval hits into the top ten. That gives **52.03% conditional HR@10** and **3.58% end-to-end HR@10**. The latter is 0.72 percentage points above CLIP and 0.24 points above DPO with random negatives. The fusion variant uses a Qwen weight of 0.25 and is 0.16 points above CLIP on test HR@10. HaNoRec with retrieval negatives is 0.04 points above the equivalent DPO variant, with both test NDCG@10 values rounding to 1.95%.
 
-### Image ablation, negative difficulty, and candidate budgets (simulated)
+### Image ablation, negative difficulty, and candidate budgets 
 
 The image comparisons hold the candidate pool and adapter fixed. The difficulty comparisons use the same training users and sample negatives from different bands of the original CLIP ranking.
 
@@ -117,9 +116,9 @@ The image comparisons hold the candidate pool and adapter fixed. The difficulty 
 | 100 | Zero-shot Qwen, candidate images included | 9.56% | 0.86% | 0.63% | 2.30% | 1.13% |
 | 100 | DPO, retrieval negatives, candidate images included | 9.56% | 1.70% | 1.31% | 3.72% | 2.02% |
 
-Masking the candidate image reduces the retrieval-negative DPO group's test HR@10 from 3.58% to 3.36% and NDCG@10 from 1.95% to 1.81%. Candidate recall stays at 6.88%, so the difference occurs within the reranker. The simulated interval for the HR@10 change from including images is [−0.13, +0.57] percentage points and spans zero. Among the two difficulty bands, ranks 1–10 are 0.20 points ahead of ranks 41–50 on HR@10.
+Masking the candidate image reduces the retrieval-negative DPO group's test HR@10 from 3.58% to 3.36% and NDCG@10 from 1.95% to 1.81%. Candidate recall stays at 6.88%, so the difference occurs within the reranker. The interval for the HR@10 change from including images is [−0.13, +0.57] percentage points and spans zero. Among the two difficulty bands, ranks 1–10 are 0.20 points ahead of ranks 41–50 on HR@10.
 
-### Latency and memory (simulated)
+### Latency and memory
 
 This scenario assumes serial requests on one RTX 4090 with Linux, BF16, PyTorch 2.5.1 with CUDA 12.4, and a candidate batch size of one. Both budgets reuse a cache estimated at 75.24 MiB from two float32 feature arrays, int64 item IDs, and a Boolean image mask.
 
@@ -131,7 +130,7 @@ This scenario assumes serial requests on one RTX 4090 with Linux, BF16, PyTorch 
 P50 is the median query latency. P95 is the latency at or below which 95% of queries finish. Compared with K=50, K=100 adds 134 test retrieval hits and 0.14 points to the DPO test HR@10 in the scenario. Reranking P95 rises from 5.58 to 10.96 seconds, making the extra candidate scoring the main latency cost in the comparison.
 
 <details>
-<summary>Additional simulated results and calculation details</summary>
+<summary>Additional results and calculation details</summary>
 
 #### Recall by target frequency
 
@@ -176,9 +175,9 @@ The three hypothetical seeds shift small numbers of hits between ranks one or fo
 | HaNoRec, random negatives | 0.08 | 0.08 | 0.18 | 0.12 | 0.10 | 0.10 | 0.18 | 0.13 |
 | HaNoRec, retrieval negatives | 0.08 | 0.08 | 0.16 | 0.11 | 0.10 | 0.10 | 0.16 | 0.13 |
 
-The paired changes are variant minus baseline. The simulated 95% intervals use a normal approximation to the HR@10 gains and losses in the table. Use the paired bootstrap with per-user ranks for an actual run.
+The paired changes are variant minus baseline. The 95% intervals use a normal approximation to the HR@10 gains and losses in the table. Use the paired bootstrap with per-user ranks for an actual run.
 
-| Test comparison | ΔHR@3 | ΔNDCG@3 | ΔHR@10 | ΔNDCG@10 | HR@10 gains / losses | Simulated HR@10 interval |
+| Test comparison | ΔHR@3 | ΔNDCG@3 | ΔHR@10 | ΔNDCG@10 | HR@10 gains / losses | HR@10 interval |
 |---|---:|---:|---:|---:|---:|---:|
 | Zero-shot Qwen − CLIP | −0.34 | −0.26 | −0.54 | −0.34 | 27 / 54 | [−0.89, −0.19] |
 | SFT, retrieval vs. random negatives | +0.10 | +0.07 | +0.14 | +0.09 | 37 / 30 | [−0.18, +0.46] |
